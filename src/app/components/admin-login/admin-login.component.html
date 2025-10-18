@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Administration</h1>
+      <p>Connectez-vous pour accéder au tableau de bord</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          placeholder="Entrez votre nom d'utilisateur"
+          [class.error]="submitted && f['username'].errors"
+        />
+        <div *ngIf="submitted && f['username'].errors" class="error-message">
+          <span *ngIf="f['username'].errors['required']">Le nom d'utilisateur est requis</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Entrez votre mot de passe"
+          [class.error]="submitted && f['password'].errors"
+        />
+        <div *ngIf="submitted && f['password'].errors" class="error-message">
+          <span *ngIf="f['password'].errors['required']">Le mot de passe est requis</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        <span *ngIf="loading">Connexion en cours...</span>
+        <span *ngIf="!loading">Se connecter</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p class="demo-info">
+        <strong>Démo:</strong> admin / admin123
+      </p>
+    </div>
+  </div>
+</div>

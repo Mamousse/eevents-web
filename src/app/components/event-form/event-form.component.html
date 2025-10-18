@@ -1,0 +1,219 @@
+<div class="form-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h1>{{ isEditMode ? 'Modifier l\'événement' : 'Créer un événement' }}</h1>
+      <button class="btn-close" (click)="cancel()">✕</button>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <div class="section">
+        <h2>Informations générales</h2>
+
+        <div class="form-group">
+          <label for="nom">Nom de l'événement *</label>
+          <input
+            type="text"
+            id="nom"
+            formControlName="nom"
+            class="form-control"
+            placeholder="Ex: Dîner de Gala 2024"
+            [class.error]="submitted && f['nom'].errors"
+          />
+          <div *ngIf="submitted && f['nom'].errors" class="error-message">
+            Le nom est requis
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date et heure *</label>
+            <input
+              type="datetime-local"
+              id="date"
+              formControlName="date"
+              class="form-control"
+              [class.error]="submitted && f['date'].errors"
+            />
+            <div *ngIf="submitted && f['date'].errors" class="error-message">
+              La date est requise
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="nombrePlacesDisponibles">Nombre de places disponibles *</label>
+            <input
+              type="number"
+              id="nombrePlacesDisponibles"
+              formControlName="nombrePlacesDisponibles"
+              class="form-control"
+              min="1"
+              placeholder="100"
+              [class.error]="submitted && f['nombrePlacesDisponibles'].errors"
+            />
+            <div *ngIf="submitted && f['nombrePlacesDisponibles'].errors" class="error-message">
+              Minimum 1 place
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="emplacement">Emplacement *</label>
+          <input
+            type="text"
+            id="emplacement"
+            formControlName="emplacement"
+            class="form-control"
+            placeholder="Ex: Hôtel Hilton, Yaoundé"
+            [class.error]="submitted && f['emplacement'].errors"
+          />
+          <div *ngIf="submitted && f['emplacement'].errors" class="error-message">
+            L'emplacement est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description (optionnel)</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="form-control"
+            rows="4"
+            placeholder="Décrivez votre événement..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Modalités d'entrée</h2>
+          <button type="button" class="btn btn-add" (click)="addModaliteEntree()">
+            + Ajouter
+          </button>
+        </div>
+
+        <div formArrayName="modalitesEntree">
+          <div
+            *ngFor="let modalite of modalitesEntree.controls; let i = index"
+            [formGroupName]="i"
+            class="dynamic-item"
+          >
+            <div class="form-row">
+              <div class="form-group" style="flex: 2;">
+                <label>Type *</label>
+                <input
+                  type="text"
+                  formControlName="type"
+                  class="form-control"
+                  placeholder="Ex: VIP, Standard, Gratuit"
+                />
+              </div>
+
+              <div class="form-group" style="flex: 1;">
+                <label>Prix (FCFA) *</label>
+                <input
+                  type="number"
+                  formControlName="prix"
+                  class="form-control"
+                  min="0"
+                  placeholder="5000"
+                />
+              </div>
+
+              <button
+                type="button"
+                class="btn-remove"
+                (click)="removeModaliteEntree(i)"
+                *ngIf="modalitesEntree.length > 1"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label>Description (optionnel)</label>
+              <input
+                type="text"
+                formControlName="description"
+                class="form-control"
+                placeholder="Ex: Accès VIP avec cocktail"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Modalités de paiement</h2>
+          <button type="button" class="btn btn-add" (click)="addModalitePaiement()">
+            + Ajouter
+          </button>
+        </div>
+
+        <div formArrayName="modalitesPaiement">
+          <div
+            *ngFor="let modalite of modalitesPaiement.controls; let i = index"
+            [formGroupName]="i"
+            class="dynamic-item"
+          >
+            <div class="form-row">
+              <div class="form-group" style="flex: 2;">
+                <label>Type *</label>
+                <input
+                  type="text"
+                  formControlName="type"
+                  class="form-control"
+                  placeholder="Ex: Mobile Money, Espèces, Carte bancaire"
+                />
+              </div>
+
+              <button
+                type="button"
+                class="btn-remove"
+                (click)="removeModalitePaiement(i)"
+                *ngIf="modalitesPaiement.length > 1"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label>Détails (optionnel)</label>
+              <input
+                type="text"
+                formControlName="details"
+                class="form-control"
+                placeholder="Ex: MTN, Orange, Moov"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="loading">Enregistrement...</span>
+          <span *ngIf="!loading">{{ isEditMode ? 'Mettre à jour' : 'Créer l\'événement' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

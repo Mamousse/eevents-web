@@ -1,0 +1,165 @@
+<div class="details-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Retour</button>
+    <h1 *ngIf="event">{{ event.nom }}</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="!loading && event" class="content">
+    <!-- Statistiques -->
+    <div class="stats-grid" *ngIf="stats">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value">{{ stats.totalReservations }}</div>
+        <div class="stat-label">Réservations</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🎫</div>
+        <div class="stat-value">{{ stats.totalPlacesReservees }}</div>
+        <div class="stat-label">Places réservées</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ stats.totalPaye }}</div>
+        <div class="stat-label">Payées</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value">{{ stats.totalNonPaye }}</div>
+        <div class="stat-label">Non payées</div>
+      </div>
+
+      <div class="stat-card highlight">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">{{ stats.revenusRecus }} FCFA</div>
+        <div class="stat-label">Revenus reçus</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value">{{ stats.revenusTotal }} FCFA</div>
+        <div class="stat-label">Revenus total</div>
+      </div>
+    </div>
+
+    <!-- QR Code et partage -->
+    <div class="qr-section">
+      <div class="qr-card">
+        <h3>Code QR pour réservation</h3>
+        <div class="qr-code">
+          <qrcode
+            [qrdata]="qrCodeData"
+            [width]="256"
+            [errorCorrectionLevel]="'M'"
+          ></qrcode>
+        </div>
+        <div class="qr-actions">
+          <button class="btn btn-whatsapp" (click)="shareWhatsApp()">
+            📱 Partager sur WhatsApp
+          </button>
+          <button class="btn btn-outline" (click)="copyLink()">
+            📋 Copier le lien
+          </button>
+        </div>
+        <div class="link-display">
+          <small>{{ qrCodeData }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des réservations -->
+    <div class="reservations-section">
+      <div class="section-header">
+        <h2>Liste des réservations ({{ filteredReservations.length }})</h2>
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="searchReservations()"
+            placeholder="Rechercher..."
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="filteredReservations.length === 0" class="empty-state">
+        <p>Aucune réservation pour le moment</p>
+      </div>
+
+      <div class="table-container" *ngIf="filteredReservations.length > 0">
+        <table class="reservations-table">
+          <thead>
+            <tr>
+              <th>Nom complet</th>
+              <th>WhatsApp</th>
+              <th>Email</th>
+              <th>Places</th>
+              <th>Modalité</th>
+              <th>Montant</th>
+              <th>Paiement</th>
+              <th>Validation</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reservation of filteredReservations">
+              <td>
+                <strong>{{ reservation.prenom }} {{ reservation.nom }}</strong>
+              </td>
+              <td>{{ reservation.numeroWhatsapp }}</td>
+              <td>{{ reservation.email || '-' }}</td>
+              <td class="text-center">{{ reservation.nombrePlaces }}</td>
+              <td>{{ reservation.modaliteEntree }}</td>
+              <td><strong>{{ reservation.montantTotal }} FCFA</strong></td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge-success]="reservation.estPaye"
+                  [class.badge-danger]="!reservation.estPaye"
+                  (click)="togglePaiement(reservation)"
+                  style="cursor: pointer;"
+                  title="Cliquer pour changer"
+                >
+                  {{ reservation.estPaye ? 'Payé' : 'Non payé' }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge-success]="reservation.estValide"
+                  [class.badge-warning]="!reservation.estValide"
+                  (click)="toggleValidation(reservation)"
+                  style="cursor: pointer;"
+                  title="Cliquer pour changer"
+                >
+                  {{ reservation.estValide ? 'Validé' : 'En attente' }}
+                </span>
+              </td>
+              <td>
+                <button
+                  class="btn-action btn-delete"
+                  (click)="deleteReservation(reservation)"
+                  title="Supprimer"
+                >
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !event" class="error-container">
+    <h2>Événement introuvable</h2>
+    <button class="btn btn-primary" (click)="goBack()">Retour au tableau de bord</button>
+  </div>
+</div>

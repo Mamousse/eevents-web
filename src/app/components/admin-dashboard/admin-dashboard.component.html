@@ -1,0 +1,95 @@
+<div class="dashboard-container">
+  <nav class="navbar">
+    <div class="navbar-content">
+      <h1 class="navbar-title">Gestion des Événements</h1>
+      <button class="btn btn-logout" (click)="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-content">
+    <div class="header-section">
+      <h2>Mes Événements</h2>
+      <div class="actions">
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="searchEvents()"
+            placeholder="Rechercher un événement..."
+            class="search-input"
+          />
+        </div>
+        <button class="btn btn-primary" (click)="createEvent()">
+          + Créer un événement
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <div *ngIf="!loading && filteredEvents.length === 0" class="empty-state">
+      <p>Aucun événement trouvé</p>
+      <button class="btn btn-primary" (click)="createEvent()">
+        Créer votre premier événement
+      </button>
+    </div>
+
+    <div class="events-grid" *ngIf="!loading && filteredEvents.length > 0">
+      <div class="event-card" *ngFor="let event of filteredEvents">
+        <div class="event-header">
+          <h3>{{ event.nom }}</h3>
+          <div class="event-actions">
+            <button class="btn-icon" (click)="editEvent(event.id!)" title="Modifier">
+              ✏️
+            </button>
+            <button class="btn-icon" (click)="deleteEvent(event)" title="Supprimer">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <div class="event-info">
+          <div class="info-row">
+            <span class="label">📅 Date:</span>
+            <span>{{ event.date | date: 'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">📍 Lieu:</span>
+            <span>{{ event.emplacement }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">🎫 Places:</span>
+            <span>{{ getPlacesRestantes(event) }} / {{ event.nombrePlacesDisponibles }} disponibles</span>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>Taux de remplissage</span>
+            <span class="percentage">{{ getTauxRemplissage(event).toFixed(0) }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="getTauxRemplissage(event)"
+              [class.high]="getTauxRemplissage(event) >= 80"
+              [class.medium]="getTauxRemplissage(event) >= 50 && getTauxRemplissage(event) < 80"
+            ></div>
+          </div>
+        </div>
+
+        <div class="event-footer">
+          <button class="btn btn-secondary" (click)="viewEventDetails(event.id!)">
+            Voir détails
+          </button>
+          <button class="btn btn-outline" (click)="copyReservationLink(event)">
+            📋 Copier lien
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
