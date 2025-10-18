@@ -1,7 +1,10 @@
 export interface User {
   id?: string;
+  prenom: string;
+  nom: string;
+  telephone: string;
   username: string;
-  email: string;
+  email?: string;
   role: 'admin' | 'user';
   createdAt?: Date;
 }

@@ -14,6 +14,7 @@ export class AdminLoginComponent implements OnInit {
   submitted = false;
   returnUrl: string = '';
   errorMessage = '';
+  showPassword = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -41,6 +42,10 @@ export class AdminLoginComponent implements OnInit {
     return this.loginForm.controls;
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.errorMessage = '';
@@ -56,10 +61,14 @@ export class AdminLoginComponent implements OnInit {
         this.router.navigate([this.returnUrl]);
       },
       error: (error) => {
-        this.errorMessage = 'Identifiants invalides. Veuillez réessayer.';
+        this.errorMessage = error.error?.error?.message || 'Identifiants invalides. Veuillez réessayer.';
         this.loading = false;
         console.error(error);
       }
     });
+  }
+
+  goToRegister(): void {
+    this.router.navigate(['/register']);
   }
 }

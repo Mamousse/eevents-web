@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { ReservationFormComponent } from './components/reservation-form/reservation-form.component';
 import { AdminLoginComponent } from './components/admin-login/admin-login.component';
+import { RegisterComponent } from './components/register/register.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { EventFormComponent } from './components/event-form/event-form.component';
 import { EventDetailsComponent } from './components/event-details/event-details.component';
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: '', redirectTo: '/admin/login', pathMatch: 'full' },
   { path: 'reservation/:id', component: ReservationFormComponent },
   { path: 'admin/login', component: AdminLoginComponent },
+  { path: 'register', component: RegisterComponent },
   {
     path: 'admin/dashboard',
     component: AdminDashboardComponent,

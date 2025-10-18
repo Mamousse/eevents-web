@@ -94,13 +94,60 @@
             placeholder="Décrivez votre événement..."
           ></textarea>
         </div>
+
+        <div class="form-group">
+          <label for="photos">Photos de l'événement (optionnel)</label>
+          <div class="file-upload-container">
+            <input
+              type="file"
+              id="photos"
+              #fileInput
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              multiple
+              class="file-input"
+            />
+            <button type="button" class="btn btn-upload" (click)="fileInput.click()">
+              <span class="material-icons">cloud_upload</span>
+              Choisir des photos
+            </button>
+          </div>
+
+          <div *ngIf="selectedFiles.length > 0" class="selected-files">
+            <div *ngFor="let file of selectedFiles; let i = index" class="file-item">
+              <span class="material-icons">image</span>
+              <span class="file-name">{{ file.name }}</span>
+              <button type="button" class="btn-remove-file" (click)="removeFile(i)">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="uploadedPhotos.length > 0" class="uploaded-photos">
+            <h4>Photos téléchargées :</h4>
+            <div class="photo-grid">
+              <div *ngFor="let photo of uploadedPhotos; let i = index" class="photo-item">
+                <img [src]="'http://localhost:3000' + photo" alt="Photo de l'événement">
+                <button type="button" class="btn-remove-photo" (click)="removeUploadedPhoto(i)">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="uploading" class="uploading-status">
+            <div class="spinner-small"></div>
+            <span>Téléchargement des photos...</span>
+          </div>
+        </div>
       </div>
 
       <div class="section">
         <div class="section-header">
           <h2>Modalités d'entrée</h2>
           <button type="button" class="btn btn-add" (click)="addModaliteEntree()">
-            + Ajouter
+            <span class="material-icons">add</span>
+            Ajouter
           </button>
         </div>
 
@@ -139,7 +186,7 @@
                 *ngIf="modalitesEntree.length > 1"
                 title="Supprimer"
               >
-                🗑️
+                <span class="material-icons">delete</span>
               </button>
             </div>
 
@@ -160,7 +207,8 @@
         <div class="section-header">
           <h2>Modalités de paiement</h2>
           <button type="button" class="btn btn-add" (click)="addModalitePaiement()">
-            + Ajouter
+            <span class="material-icons">add</span>
+            Ajouter
           </button>
         </div>
 
@@ -188,7 +236,7 @@
                 *ngIf="modalitesPaiement.length > 1"
                 title="Supprimer"
               >
-                🗑️
+                <span class="material-icons">delete</span>
               </button>
             </div>
 

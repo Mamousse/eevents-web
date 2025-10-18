@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../../services/event.service';
+import { UploadService } from '../../services/upload.service';
 import { Event } from '../../models/event.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-event-form',
@@ -17,12 +19,16 @@ export class EventFormComponent implements OnInit {
   submitted = false;
   errorMessage = '';
   successMessage = '';
+  selectedFiles: File[] = [];
+  uploadedPhotos: string[] = [];
+  uploading = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private eventService: EventService
+    private eventService: EventService,
+    private uploadService: UploadService
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +64,7 @@ export class EventFormComponent implements OnInit {
 
   createModalitePaiement(): FormGroup {
     return this.formBuilder.group({
-      type: ['', Validators.required],
+      type: ['Espèces', Validators.required], // Valeur par défaut
       details: ['']
     });
   }
@@ -123,6 +129,11 @@ export class EventFormComponent implements OnInit {
       description: event.description || ''
     });
 
+    // Charger les photos existantes
+    if (event.photos && event.photos.length > 0) {
+      this.uploadedPhotos = event.photos;
+    }
+
     // Remplir les modalités d'entrée
     this.modalitesEntree.clear();
     event.modalitesEntree.forEach(modalite => {
@@ -141,6 +152,49 @@ export class EventFormComponent implements OnInit {
         details: [modalite.details || '']
       }));
     });
+  }
+
+  // Gérer la sélection de fichiers
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        this.selectedFiles.push(files[i]);
+      }
+      // Upload immédiat
+      this.uploadFiles();
+    }
+  }
+
+  // Upload les fichiers sélectionnés
+  uploadFiles(): void {
+    if (this.selectedFiles.length === 0) return;
+
+    this.uploading = true;
+    this.uploadService.uploadMultipleFiles(this.selectedFiles).subscribe({
+      next: (responses) => {
+        responses.forEach(response => {
+          this.uploadedPhotos.push(response.url);
+        });
+        this.selectedFiles = [];
+        this.uploading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors de l\'upload:', error);
+        this.errorMessage = 'Erreur lors de l\'upload des photos';
+        this.uploading = false;
+      }
+    });
+  }
+
+  // Retirer un fichier de la liste de sélection
+  removeFile(index: number): void {
+    this.selectedFiles.splice(index, 1);
+  }
+
+  // Retirer une photo déjà uploadée
+  removeUploadedPhoto(index: number): void {
+    this.uploadedPhotos.splice(index, 1);
   }
 
   formatDateForInput(date: Date): string {
@@ -169,7 +223,8 @@ export class EventFormComponent implements OnInit {
 
     const eventData: any = {
       ...this.eventForm.value,
-      date: new Date(this.eventForm.value.date)
+      date: new Date(this.eventForm.value.date),
+      photos: this.uploadedPhotos
     };
 
     if (this.isEditMode && this.eventId) {

@@ -13,6 +13,7 @@ import { AdminLoginComponent } from './components/admin-login/admin-login.compon
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { EventFormComponent } from './components/event-form/event-form.component';
 import { EventDetailsComponent } from './components/event-details/event-details.component';
+import { RegisterComponent } from './components/register/register.component';
 
 // Services
 import { EventService } from './services/event.service';
@@ -29,7 +30,8 @@ import { AuthGuard } from './guards/auth.guard';
     AdminLoginComponent,
     AdminDashboardComponent,
     EventFormComponent,
-    EventDetailsComponent
+    EventDetailsComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

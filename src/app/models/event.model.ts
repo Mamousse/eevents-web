@@ -12,6 +12,8 @@ export interface Event {
   updatedAt?: Date;
   qrCodeUrl?: string;
   lienReservation?: string;
+  photos?: string[];
+  flyerUrl?: string;
 }
 
 export interface ModaliteEntree {

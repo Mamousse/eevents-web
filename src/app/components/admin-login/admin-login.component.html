@@ -1,17 +1,25 @@
 <div class="login-container">
   <div class="login-card">
     <div class="login-header">
-      <h1>Administration</h1>
+      <div class="logo-section">
+        <span class="material-icons logo-icon">event</span>
+        <h1>E-Events</h1>
+      </div>
+      <h2>Connexion</h2>
       <p>Connectez-vous pour accéder au tableau de bord</p>
     </div>
 
     <div *ngIf="errorMessage" class="alert alert-error">
+      <span class="material-icons">error</span>
       {{ errorMessage }}
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Nom d'utilisateur</label>
+        <label for="username">
+          <span class="material-icons">account_circle</span>
+          Nom d'utilisateur
+        </label>
         <input
           type="text"
           id="username"
@@ -19,37 +27,52 @@
           class="form-control"
           placeholder="Entrez votre nom d'utilisateur"
           [class.error]="submitted && f['username'].errors"
+          autofocus
         />
         <div *ngIf="submitted && f['username'].errors" class="error-message">
-          <span *ngIf="f['username'].errors['required']">Le nom d'utilisateur est requis</span>
+          Le nom d'utilisateur est requis
         </div>
       </div>
 
       <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          placeholder="Entrez votre mot de passe"
-          [class.error]="submitted && f['password'].errors"
-        />
+        <label for="password">
+          <span class="material-icons">lock</span>
+          Mot de passe
+        </label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            placeholder="Entrez votre mot de passe"
+            [class.error]="submitted && f['password'].errors"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          >
+            <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
         <div *ngIf="submitted && f['password'].errors" class="error-message">
-          <span *ngIf="f['password'].errors['required']">Le mot de passe est requis</span>
+          Le mot de passe est requis
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary" [disabled]="loading">
-        <span *ngIf="loading">Connexion en cours...</span>
-        <span *ngIf="!loading">Se connecter</span>
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <span *ngIf="!loading" class="material-icons">login</span>
+        <span *ngIf="loading" class="spinner-small"></span>
+        <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
       </button>
-    </form>
 
-    <div class="login-footer">
-      <p class="demo-info">
-        <strong>Démo:</strong> admin / admin123
-      </p>
-    </div>
+      <div class="login-footer">
+        <p>Vous n'avez pas de compte ?</p>
+        <button type="button" class="btn-link" (click)="goToRegister()">
+          Créer un compte
+        </button>
+      </div>
+    </form>
   </div>
 </div>

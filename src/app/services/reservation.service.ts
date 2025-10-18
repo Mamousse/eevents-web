@@ -8,7 +8,7 @@ import { Reservation, ReservationStats } from '../models/reservation.model';
   providedIn: 'root'
 })
 export class ReservationService {
-  private apiUrl = 'http://localhost:3000/reservations';
+  private apiUrl = 'eevents-api-production.up.railway.app/reservations';
 
   constructor(private http: HttpClient) { }
 
