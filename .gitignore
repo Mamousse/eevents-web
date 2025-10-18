@@ -7,10 +7,10 @@
 /.angular/
 .angular/
 
-# Node modules and dependency files
-/node_modules/
+# Node modules and dependency files/node_modules/
 /package-lock.json
 /yarn.lock
+/claude
 
 # Environment files
 /.env
