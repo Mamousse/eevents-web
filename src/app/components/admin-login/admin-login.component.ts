@@ -58,12 +58,16 @@ export class AdminLoginComponent implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
+        this.loading = false;
         this.router.navigate([this.returnUrl]);
       },
       error: (error) => {
         this.errorMessage = error.error?.error?.message || 'Identifiants invalides. Veuillez réessayer.';
         this.loading = false;
         console.error(error);
+      },
+      complete: () => {
+        this.loading = false;
       }
     });
   }

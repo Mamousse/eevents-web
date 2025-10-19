@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface UploadResponse {
   url: string;
@@ -11,7 +12,8 @@ export interface UploadResponse {
   providedIn: 'root'
 })
 export class UploadService {
-  private apiUrl = 'eevents-api-production.up.railway.app/upload';
+  private baseurl = environment.apiUrl;
+  private apiUrl = this.baseurl + '/upload';
 
   constructor(private http: HttpClient) { }
 

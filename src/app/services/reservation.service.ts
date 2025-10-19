@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Reservation, ReservationStats } from '../models/reservation.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservationService {
-  private apiUrl = 'eevents-api-production.up.railway.app/reservations';
+  private baseurl = environment.apiUrl;
+  private apiUrl = this.baseurl + '/reservations';
 
   constructor(private http: HttpClient) { }
 

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, throwError, TimeoutError } from 'rxjs';
+import { tap, catchError, timeout } from 'rxjs/operators';
 import { User, LoginRequest, AuthResponse } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 export interface RegisterRequest {
   prenom: string;
@@ -17,9 +18,12 @@ export interface RegisterRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'eevents-api-production.up.railway.app/auth'
-  //'http://localhost:3000/auth';
-  private usersApiUrl = 'eevents-api-production.up.railway.app/users';
+  // Configuration automatique selon l'environnement
+  // Pour basculer entre local et Railway, modifiez le fichier src/environments/environment.ts
+  private baseurl = environment.apiUrl;
+
+  private apiUrl = this.baseurl + '/auth';
+  private usersApiUrl = this.baseurl + '/users';
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
 
@@ -39,23 +43,50 @@ export class AuthService {
   register(userData: RegisterRequest): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/register`, userData)
       .pipe(
-        catchError(error => {
-          return throwError(() => error);
+        timeout(15000), // Timeout de 15 secondes
+        catchError((error: HttpErrorResponse | TimeoutError) => {
+          let errorMessage = 'Une erreur est survenue lors de l\'inscription';
+
+          if (error instanceof TimeoutError) {
+            errorMessage = 'Le serveur ne répond pas. Vérifiez votre connexion ou réessayez plus tard.';
+          } else if (error.status === 0) {
+            errorMessage = 'Impossible de contacter le serveur. Vérifiez que le backend est démarré.';
+          } else if (error.error?.error?.message) {
+            errorMessage = error.error.error.message;
+          }
+
+          console.error('Erreur d\'inscription:', error);
+          return throwError(() => ({ error: { error: { message: errorMessage } } }));
         })
       );
   }
 
   // Connexion
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    console.log("login oiviosvffs ", this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials))
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
+        timeout(15000), // Timeout de 15 secondes
         tap(response => {
           localStorage.setItem('currentUser', JSON.stringify(response.user));
           localStorage.setItem('token', response.token);
           this.currentUserSubject.next(response.user);
         }),
-        catchError(error => {
-          return throwError(() => error);
+        catchError((error: HttpErrorResponse | TimeoutError) => {
+          let errorMessage = 'Une erreur est survenue lors de la connexion';
+
+          if (error instanceof TimeoutError) {
+            errorMessage = 'Le serveur ne répond pas. Vérifiez votre connexion ou réessayez plus tard.';
+          } else if (error.status === 0) {
+            errorMessage = 'Impossible de contacter le serveur. Vérifiez que le backend est démarré.';
+          } else if (error.status === 401) {
+            errorMessage = 'Nom d\'utilisateur ou mot de passe incorrect.';
+          } else if (error.error?.error?.message) {
+            errorMessage = error.error.error.message;
+          }
+
+          console.error('Erreur de connexion:', error);
+          return throwError(() => ({ error: { error: { message: errorMessage } } }));
         })
       );
   }

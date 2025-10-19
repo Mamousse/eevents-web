@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Event } from '../models/event.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'eevents-api-production.up.railway.app/events';
+  private baseurl = environment.apiUrl;
+  private apiUrl = this.baseurl + '/events';
 
   constructor(private http: HttpClient) { }
 
